@@ -11,6 +11,8 @@ in essence, this project is a collection of grammar rules and small scripts for 
 
 ## installation
 
+> note that this crate is not published yet. it will be once it's atleast semi-complete
+
 ```bash
 # in your project
 cargo add netdec
