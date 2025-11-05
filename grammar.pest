@@ -24,8 +24,8 @@ range_cidr = @{ ip ~ "/" ~ cidr_suffix } // ip address followed by a cidr suffix
 range_hyphen = @{ ip ~ "-" ~ ip } // two ip addresses joined by a hyphen, ex. 192.168.0.0-192.168.0.100
 
 w_octet = @{ "*" | octet }
-range_wildcard = @{ octet ~ "." ~ w_octet ~ ( "." ~ w_octet ){0,2} } // wildcard notation, ex. 192.168.*
-
+range_wildcard = @{ octet ~ "." ~ w_octet ~ ( "." ~ w_octet ){0,2} } // wildcard notation, ex. 192.168.* 
+// ^ WRONGFULLY MATCHES 10.*.1 AND 1.2.3, FIX OR REWRITE LATER
 
 
 range_any = { range_cidr | range_hyphen | range_wildcard } // any of the ip ranges defined above
