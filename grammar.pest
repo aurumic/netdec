@@ -1,0 +1,31 @@
+octet = @{
+  // 0-255 range
+  ("25" ~ '0'..'5') |
+  ("2" ~ '0'..'4' ~ ASCII_DIGIT) |
+  ("1" ~ ASCII_DIGIT ~ ASCII_DIGIT) |
+  ('1'..'9' ~ ASCII_DIGIT) |
+  ASCII_DIGIT
+}
+
+cidr_suffix = @{
+  // 0-32 range
+  ("3" ~ '0'..'2') |
+  ("2" ~ ASCII_DIGIT) |
+  ("1" ~ ASCII_DIGIT) |
+  ASCII_DIGIT
+}
+
+ip = @{ octet ~ "." ~ octet ~ "." ~ octet ~ "." ~ octet } // self explainatory, ex. 192.168.0.1
+
+
+
+range_cidr = @{ ip ~ "/" ~ cidr_suffix } // ip address followed by a cidr suffix, ex. 192.168.0.1/24
+
+range_hyphen = @{ ip ~ "-" ~ ip } // two ip addresses joined by a hyphen, ex. 192.168.0.0-192.168.0.100
+
+w_octet = @{ "*" | octet }
+range_wildcard = @{ octet ~ "." ~ w_octet ~ ( "." ~ w_octet ){0,2} } // wildcard notation, ex. 192.168.*
+
+
+
+range_any = { range_cidr | range_hyphen | range_wildcard } // any of the ip ranges defined above
