@@ -1,0 +1,10 @@
+[package]
+name = "netdec"
+version = "0.1.0"
+edition = "2024"
+description = "a tool to unfold and identify ip ranges"
+license = "MIT"
+
+[dependencies]
+pest = "2.8.3"
+pest_derive = "2.8.3"
