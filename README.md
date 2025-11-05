@@ -27,9 +27,10 @@ cargo add netdec
 
 use netdec::is_valid_ip_range;
 
-assert!(is_valid_ip_range("10.*")) // True
-assert!(is_valid_ip_range("192.168.0.0/24")) // True
-assert!(is_valid_ip_range("256.0.0.1")) // False
+assert!(is_valid_range_cidr("192.168.0.0/24")) // True
+assert!(is_valid_range_hyphen("192.168.0.0-192.168.0.100")) // True
+assert!(is_valid_range_wildcard("10.*")) // True
+assert!(is_valid_range_any("256.0.0.1")) // False
 ```
 
 ```rust
@@ -39,9 +40,12 @@ OTHER FEATURES TBA
 ### cli
 
 ```bash
-TBA
+cargo run -- "192.168.*" # valid
 ```
 
+```rust
+PROPER CLI IMPLEMENTATION TBA
+```
 
 
 ## planned features
