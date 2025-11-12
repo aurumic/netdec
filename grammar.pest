@@ -19,7 +19,7 @@ ip = @{ octet ~ "." ~ octet ~ "." ~ octet ~ "." ~ octet } // self explainatory, 
 
 
 
-range_cidr = @{ ip ~ "/" ~ cidr_suffix } // ip address followed by a cidr prefix, ex. 192.168.0.1/24
+range_cidr = @{ ip ~ "/" ~ cidr_prefix } // ip address followed by a cidr prefix, ex. 192.168.0.1/24
 
 range_hyphen = @{ ip ~ "-" ~ ip } // two ip addresses joined by a hyphen, ex. 192.168.0.0-192.168.0.100
 
