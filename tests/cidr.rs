@@ -1,16 +1,16 @@
-use netdec::{matches_cidr_suffix, matches_range_cidr};
+use netdec::{matches_cidr_prefix, matches_range_cidr};
 
 #[test]
-fn cidr_suffix_accepts_0_to_32() {
+fn cidr_prefix_accepts_0_to_32() {
   for s in ["0", "1", "8", "16", "24", "30", "31", "32"] {
-    assert!(matches_cidr_suffix(s), "suffix {s} should be valid");
+    assert!(matches_cidr_prefix(s), "prefix {s} should be valid");
   }
 }
 
 #[test]
-fn cidr_suffix_rejects_out_of_range() {
+fn cidr_prefix_rejects_out_of_range() {
   for s in ["33", "100", "-1", "09", ""] {
-    assert!(!matches_cidr_suffix(s), "suffix {s} should be invalid");
+    assert!(!matches_cidr_prefix(s), "prefix {s} should be invalid");
   }
 }
 
