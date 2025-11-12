@@ -1,8 +1,10 @@
 use pest::Parser;
 use pest_derive::Parser;
 use thiserror::Error;
+
 use std::net::Ipv4Addr;
 use std::str::FromStr;
+use std::iter::FusedIterator;
 
 #[derive(Parser)]
 #[grammar = "grammar.pest"]
@@ -10,7 +12,7 @@ struct IpParser;
 
 #[derive(Debug, Error)]
 pub enum IpRangeError {
-  #[error("parse error")]
+  #[error(transparent)]
   Pest(#[from] pest::error::Error<Rule>),
 
   #[error("invalid IPv4 address: {0}")]
@@ -50,6 +52,13 @@ pub struct IpRange {
   pub hostmask: Option<Ipv4Addr>, // host mask
 
   pub size: u128, // number of IPv4 addresses covered inside the range
+}
+
+#[derive(Clone, Debug)]
+pub struct IpRangeIter {
+  cur: u32,
+  end: u32,
+  done: bool,
 }
 
 impl IpRange {
@@ -211,10 +220,94 @@ impl IpRange {
     let b = u32::from(self.last);
     a <= x && x <= b
   }
+
+  pub fn iter(&self) -> IpRangeIter {
+    // iterator over all ips in the range
+    IpRangeIter {
+      cur: u32::from(self.first),
+      end: u32::from(self.last),
+      done: false,
+    }
+  }
 }
 
 pub fn is_valid_ip_range(input: &str) -> bool {
   IpRange::is_valid(input)
+}
+
+
+// ===== iterator logic =====
+
+
+impl Iterator for IpRangeIter {
+  type Item = std::net::Ipv4Addr;
+
+  fn next(&mut self) -> Option<Self::Item> {
+    if self.done {
+      return None;
+    }
+
+    let out = self.cur;
+    if self.cur == self.end {
+      self.done = true;
+    } else {
+      self.cur = self.cur.wrapping_add(1);
+    }
+
+    Some(std::net::Ipv4Addr::from(out))
+  }
+
+  fn size_hint(&self) -> (usize, Option<usize>) {
+    if self.done {
+      return (0, Some(0));
+    }
+
+    let rem = (self.end as u128)
+      .wrapping_sub(self.cur as u128)
+      .wrapping_add(1);
+    let lb = rem.min(usize::MAX as u128) as usize;
+
+    (lb, None)
+  }
+}
+
+impl DoubleEndedIterator for IpRangeIter {
+  fn next_back(&mut self) -> Option<Self::Item> {
+    if self.done {
+      return None;
+    }
+
+    let out = self.end;
+    if self.cur == self.end {
+      self.done = true;
+    } else {
+      self.end = self.end.wrapping_sub(1);
+    }
+
+    Some(std::net::Ipv4Addr::from(out))
+  }
+}
+
+impl FusedIterator for IpRangeIter {}
+
+impl IntoIterator for IpRange {
+  // iterate by value, ex. for ip in ip_range { ... }
+  type Item = std::net::Ipv4Addr;
+  type IntoIter = IpRangeIter;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.iter()
+  }
+}
+
+impl IntoIterator for &IpRange {
+  // iterate by reference, ex. for ip in &ip_range { ... }
+  type Item = std::net::Ipv4Addr;
+  type IntoIter = IpRangeIter;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.iter()
+  }
 }
 
 
